@@ -134,6 +134,11 @@ details p,details li{font-size:14px;color:var(--soft)}
 <div class="cols" id="cols" role="group" aria-label="Color"></div>
 <p style="margin:-6px 0 16px"><a class="btn s" id="photos" href="#" style="font-size:15px;min-height:44px;padding:10px 16px">See real photos of these colors on Apple.com ↗</a></p>
 </div>
+<div id="stepS" hidden>
+<span class="lbl">Storage</span>
+<p class="soft small" style="margin:2px 0 0">256GB is enough for most people. Go bigger if you shoot a lot of video or keep everything on your phone.</p>
+<div class="pk" id="sto" role="group" aria-label="Storage"></div>
+</div>
 <div id="step3" hidden>
 <label class="lbl" for="who">Your name</label>
 <input type="text" id="who" autocomplete="given-name" placeholder="Mom">
@@ -154,7 +159,7 @@ details p,details li{font-size:14px;color:var(--soft)}
 <li>The credit comes as 36 monthly bill credits that pay down the phone. If you cancel early or pay the phone off, the remaining credits stop and you owe the rest.</li>
 <li>The phone credit uses that line's Picks for the 36 months, so that line won't also get a free perk like Netflix.</li>
 <li>Due at purchase: sales tax on the full phone price and a $35 device connection charge per line.</li>
-<li>Full prices (T-Mobile, 256GB): iPhone 17e $699.99, iPhone 17 $929.99, iPhone 18 Pro $1,199.99.</li>
+<li>Full prices at T-Mobile: iPhone 17e $699.99 (256GB) or $899.99 (512GB); iPhone 17 $929.99 or $1,129.99; iPhone 18 Pro $1,199.99, $1,399.99 (512GB), $1,799.99 (1TB) or $2,399.99 (2TB). The $700 credit is the same at every size.</li>
 <li>No trade-in is required for the credit.</li>
 <li>Plan price is with AutoPay ($10/line more without), before taxes and fees. Confirm everything at the store before you sign.</li>
 </ul>
@@ -186,9 +191,9 @@ const OLD=[
 ["iPhone 15 Pro Max","A17 Pro",5,6.7,120,48,5,29,"USB-C",1,1,221]
 ].map(a=>({name:a[0],chip:a[1],rank:a[2],scr:a[3],hz:a[4],mp:a[5],uw:1,zoom:a[6],bat:a[7],port:a[8],ai:a[9],sat:a[10],wt:a[11]}));
 const NEW=[
-{cols:[["Black","#1c1c1e"],["White","#f2f2f0"],["Soft Pink","#f2d4d7"]],url:"https://www.apple.com/shop/buy-iphone/iphone-17e",name:"iPhone 17e",chip:"A19",rank:6,scr:6.1,hz:60,mp:48,uw:0,zoom:2,bat:26,port:"USB-C",ai:1,sat:1,wt:169,full:699.99,tag:"Best value"},
-{cols:[["Black","#1c1c1e"],["White","#f2f2f0"],["Mist Blue","#b9cbe0"],["Sage","#b7c4a8"],["Lavender","#cfc4e3"]],url:"https://www.apple.com/shop/buy-iphone/iphone-17",name:"iPhone 17",chip:"A19",rank:6,scr:6.3,hz:120,mp:48,uw:1,zoom:2,bat:30,port:"USB-C",ai:1,sat:1,wt:177,full:929.99,tag:"Best all-around"},
-{cols:[["Black","#1c1c1e"],["Silver","#dcdcdc"],["Glacier","#bcd6e6"],["Burgundy","#6b1f2e"]],url:"https://www.apple.com/shop/buy-iphone/iphone-18-pro",name:"iPhone 18 Pro",chip:"A20 Pro",rank:7,scr:6.3,hz:120,mp:48,uw:1,zoom:4,bat:36,port:"USB-C",ai:1,sat:1,wt:211,full:1199.99,tag:"Best camera and battery"}
+{st:[["256GB",699.99],["512GB",899.99]],cols:[["Black","#1c1c1e"],["White","#f2f2f0"],["Soft Pink","#f2d4d7"]],url:"https://www.apple.com/shop/buy-iphone/iphone-17e",name:"iPhone 17e",chip:"A19",rank:6,scr:6.1,hz:60,mp:48,uw:0,zoom:2,bat:26,port:"USB-C",ai:1,sat:1,wt:169,full:699.99,tag:"Best value"},
+{st:[["256GB",929.99],["512GB",1129.99]],cols:[["Black","#1c1c1e"],["White","#f2f2f0"],["Mist Blue","#b9cbe0"],["Sage","#b7c4a8"],["Lavender","#cfc4e3"]],url:"https://www.apple.com/shop/buy-iphone/iphone-17",name:"iPhone 17",chip:"A19",rank:6,scr:6.3,hz:120,mp:48,uw:1,zoom:2,bat:30,port:"USB-C",ai:1,sat:1,wt:177,full:929.99,tag:"Best all-around"},
+{st:[["256GB",1199.99],["512GB",1399.99],["1TB",1799.99],["2TB",2399.99]],cols:[["Black","#1c1c1e"],["Silver","#dcdcdc"],["Glacier","#bcd6e6"],["Burgundy","#6b1f2e"]],url:"https://www.apple.com/shop/buy-iphone/iphone-18-pro",name:"iPhone 18 Pro",chip:"A20 Pro",rank:7,scr:6.3,hz:120,mp:48,uw:1,zoom:4,bat:36,port:"USB-C",ai:1,sat:1,wt:211,full:1199.99,tag:"Best camera and battery"}
 ];
 const CREDIT=700,MONTHS=36;
 const money=v=>"$"+v.toFixed(2);
@@ -213,7 +218,7 @@ const cost=n=>{const left=Math.max(0,n.full-CREDIT),mo=left/MONTHS;return {mo:mo
 function render(){
 const o=OLD[sel.value];
 let h=`<thead><tr><th class="row"></th><th>Your ${o.name.replace("iPhone ","")}</th>${NEW.map(n=>`<th>${n.name}<br><span class="soft small" style="font-weight:400">${n.tag}</span></th>`).join("")}</tr></thead><tbody>`;
-h+=`<tr><th class="row" scope="row">Phone cost per month</th><td class="base"><b>—</b></td>${NEW.map(n=>{const c=cost(n);return `<td class="money"><b class="mo">${c.mo}<small>/mo</small></b><i>${c.note}</i></td>`}).join("")}</tr>`;
+h+=`<tr><th class="row" scope="row">Phone cost per month (256GB)</th><td class="base"><b>—</b></td>${NEW.map(n=>{const c=cost(n);return `<td class="money"><b class="mo">${c.mo}<small>/mo</small></b><i>${c.note}</i></td>`}).join("")}</tr>`;
 h+=`<tr><th class="row" scope="row">Total per month</th><td class="base"><b>—</b></td>${NEW.map(n=>{const left=Math.max(0,n.full-CREDIT)/MONTHS;return `<td class="money"><b>${left<0.5?"$25":money(25+left)}<small>/mo</small></b><i>$25 plan + phone</i></td>`}).join("")}</tr>`;
 for(const [label,val,judge] of ROWS){
 h+=`<tr><th class="row" scope="row">${label}</th><td class="base"><b>${val(o)[0]}</b></td>`;
@@ -223,22 +228,25 @@ document.getElementById("grid").innerHTML=h+"</tbody>";
 try{localStorage.setItem("curPhone",sel.value)}catch(e){}
 }
 sel.addEventListener("change",render);render();
-let P=null,C=null;
+let P=null,C=null,S=null;
 const pk=document.getElementById("pk"),cols=document.getElementById("cols"),who=document.getElementById("who"),err=document.getElementById("err"),msgEl=document.getElementById("msg"),send=document.getElementById("send");
 pk.innerHTML=NEW.map((n,i)=>`<button type="button" class="opt" data-i="${i}" aria-pressed="false"><b>${n.name}</b><span>${cost(n).mo}/mo phone · ${n.tag}</span></button>`).join("");
-const text=()=>{const nm=who.value.trim();return nm+" picked the "+NEW[P].name+" in "+C+" (256GB)."};
+const text=()=>{const nm=who.value.trim();return nm+" picked the "+NEW[P].name+" in "+C+", "+NEW[P].st[S][0]+"."};
 function sync(){
 for(const b of pk.children)b.setAttribute("aria-pressed",b.dataset.i==P);
 for(const b of cols.querySelectorAll("button"))b.setAttribute("aria-pressed",b.dataset.c===C);
-const ok=P!==null&&C&&who.value.trim();
+for(const b of document.getElementById("sto").children)b.setAttribute("aria-pressed",b.dataset.s==S);
+const ok=P!==null&&C&&S!==null&&who.value.trim();
 if(ok){msgEl.hidden=false;msgEl.textContent=text();send.href="sms:?&body="+encodeURIComponent(text())}else{msgEl.hidden=true;send.href="#"}
 }
 pk.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;P=+b.dataset.i;C=null;
-document.getElementById("step2").hidden=false;document.getElementById("step3").hidden=true;document.getElementById("colLbl").textContent=NEW[P].name+" colors";document.getElementById("photos").href=NEW[P].url;
+document.getElementById("step2").hidden=false;document.getElementById("step3").hidden=true;document.getElementById("stepS").hidden=true;S=null;
+document.getElementById("sto").innerHTML=NEW[P].st.map(([g,f],k)=>{const mo=Math.max(0,f-CREDIT)/MONTHS;return `<button type="button" class="opt" data-s="${k}" aria-pressed="false"><b>${g}</b><span>${mo<0.5?"$0":money(mo)}/mo phone · ${money(25+mo)}/mo total</span></button>`}).join("");document.getElementById("colLbl").textContent=NEW[P].name+" colors";document.getElementById("photos").href=NEW[P].url;
 cols.innerHTML=NEW[P].cols.map(([c,h])=>`<button type="button" class="col" data-c="${c}" aria-pressed="false"><span class="dot" style="background:${h}"></span>${c}</button>`).join("");err.textContent="";sync()});
-cols.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;C=b.dataset.c;err.textContent="";document.getElementById("step3").hidden=false;sync()});
+cols.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;C=b.dataset.c;err.textContent="";document.getElementById("stepS").hidden=false;sync()});
+document.getElementById("sto").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;S=+b.dataset.s;err.textContent="";document.getElementById("step3").hidden=false;sync()});
 who.addEventListener("input",()=>{err.textContent="";sync()});
-function check(){if(P===null){err.textContent="Pick a phone first.";return false}if(!C){err.textContent="Pick a color.";return false}if(!who.value.trim()){err.textContent="Add your name so Matt knows who it's from.";who.focus();return false}return true}
+function check(){if(P===null){err.textContent="Pick a phone first.";return false}if(!C){err.textContent="Pick a color.";return false}if(S===null){err.textContent="Pick a storage size.";return false}if(!who.value.trim()){err.textContent="Add your name so Matt knows who it's from.";who.focus();return false}return true}
 send.addEventListener("click",e=>{if(!check())e.preventDefault()});
 document.getElementById("copy").addEventListener("click",async()=>{if(!check())return;try{await navigator.clipboard.writeText(text());err.textContent="";document.getElementById("copy").textContent="Copied ✓";document.getElementById("hint").textContent="Copied! Now open Messages, start a text to Matt, and paste."}catch(x){err.textContent="Couldn't copy. Press and hold the message below to copy it."}});
 
