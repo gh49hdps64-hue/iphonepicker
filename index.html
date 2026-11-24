@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Family iPhone picker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: direct, calm family decision aid; no hype
+   IDEA: a printed spec sheet with marked-up cells, like a teacher's grading
+   PICTURE: the live comparison grid, coloured cell by cell against your phone
+   COLOUR and TYPE: white, ink, prussian accent; green/yellow/red only for verdicts; Literata
+   LAYOUT: plan summary, phone picker + 3 price cards, grid, upgrade box, fine print */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#0f1217);--ink:light-dark(#10131a,#e9ebef);--soft:light-dark(#5a6070,#a3a9b6);
+--line:light-dark(#e3e5ea,#262b35);--panel:light-dark(#f5f6f8,#171b22);--acc:light-dark(#0b4f8a,#7fb6ea);
+--gb:light-dark(#e2f3df,#16301a);--gt:light-dark(#1b5e26,#9bdca4);
+--yb:light-dark(#fbf1cc,#33290c);--yt:light-dark(#6e5200,#f0d27a);
+--rb:light-dark(#fbe1e1,#3a1618);--rt:light-dark(#9b1620,#f4a3a8);
+--nb:light-dark(#f1f2f4,#1c2028);--nt:light-dark(#3d4350,#c3c8d2)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Literata,Georgia,serif;overflow-x:clip}
+.wrap{max-width:1040px;margin:0 auto;padding:clamp(20px,4vw,48px) max(4vw,16px)}
+h1{font-size:clamp(30px,5vw,44px);line-height:1.05;margin:0 0 8px;font-weight:600;text-wrap:balance}
+h2{font-size:24px;line-height:1.15;margin:0 0 6px;font-weight:600}
+p{margin:0 0 10px}.soft{color:var(--soft)}.small{font-size:14px}
+section{margin-top:36px}
+.plan{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.box{background:var(--panel);border-radius:12px;padding:16px 18px}
+.box h3{font-size:16px;margin:0 0 8px;font-weight:600}
+ul.k{list-style:none;margin:0;padding:0}ul.k li{padding:5px 0;border-top:1px solid var(--line);font-size:15px}
+ul.k li:first-child{border-top:0}
+.yes::before{content:"✓ ";color:var(--gt);font-weight:600}.no::before{content:"✕ ";color:var(--rt);font-weight:600}
+.pick{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:14px 0 18px}
+label{font-weight:600}
+select{font:inherit;font-size:17px;padding:10px 14px;min-height:46px;border:2px solid var(--acc);border-radius:10px;background:var(--bg);color:var(--ink)}
+select:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.card{border:1px solid var(--line);border-radius:12px;padding:16px}
+.card .n{font-weight:600;font-size:18px}.card .m{font-size:34px;font-weight:600;line-height:1.1;margin:6px 0 2px;white-space:nowrap}
+.card .m small{font-size:16px;font-weight:400;color:var(--soft)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:14px;margin:18px 0 8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}.sw{width:14px;height:14px;border-radius:3px;display:inline-block}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:separate;border-spacing:4px;font-size:15px;min-width:620px}
+th{text-align:left;font-weight:600;padding:8px 10px;vertical-align:bottom}
+th.row{width:150px;color:var(--soft);font-weight:600;font-size:14px;vertical-align:middle}
+td{padding:9px 10px;border-radius:8px;vertical-align:top;line-height:1.35}
+td b{display:block;font-weight:600}td i{font-style:normal;font-size:13px;opacity:.85}
+.base{background:var(--panel)}.g{background:var(--gb);color:var(--gt)}.y{background:var(--yb);color:var(--yt)}
+.r{background:var(--rb);color:var(--rt)}
+.pk{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:8px 0 16px}
+.opt{font:inherit;text-align:left;border:2px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:12px 14px;min-height:44px;cursor:pointer}
+.opt[aria-pressed=true]{border-color:var(--acc);background:var(--panel)}
+.opt b{display:block;font-size:17px}.opt span{font-size:14px;color:var(--soft)}
+.cols{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 16px}
+.col{font:inherit;font-size:15px;display:inline-flex;align-items:center;gap:8px;border:2px solid var(--line);border-radius:999px;background:var(--bg);color:var(--ink);padding:8px 14px 8px 8px;min-height:44px;cursor:pointer}
+.col[aria-pressed=true]{border-color:var(--acc);background:var(--panel)}
+.dot{width:24px;height:24px;border-radius:50%;border:1px solid rgba(0,0,0,.25)}
+input[type=text]{font:inherit;font-size:17px;padding:10px 14px;min-height:46px;border:2px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);width:min(100%,320px)}
+input[type=text]:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.go{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:6px}
+.btn{font:inherit;font-size:17px;font-weight:600;border:0;border-radius:10px;padding:12px 20px;min-height:48px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.btn.p{background:var(--acc);color:var(--bg)}.btn.s{background:var(--panel);color:var(--ink);border:1px solid var(--line)}
+.msg{background:var(--panel);border-radius:10px;padding:12px 14px;margin-top:12px;font-size:15px}
+.err{color:var(--rt);font-size:14px;min-height:20px;margin-top:6px}
+.lbl{display:block;font-weight:600;margin-top:4px}
+@media(max-width:700px){.pk{grid-template-columns:minmax(0,1fr)}}
+.money{border:2px solid var(--acc);background:var(--bg)}.money .mo{font-size:24px;line-height:1.15;white-space:nowrap}.money small{font-size:14px;font-weight:400;color:var(--soft)}.u{background:var(--nb);color:var(--nt)}
+.up{border:2px solid var(--acc);border-radius:14px;padding:20px}
+.price{font-size:clamp(34px,6vw,48px);font-weight:600;line-height:1;color:var(--acc);white-space:nowrap}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:6px 0 4px}
+.seg button{font:inherit;font-size:15px;border:0;background:transparent;color:var(--ink);padding:10px 16px;min-height:44px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--acc);color:var(--bg)}
+.gain{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px 16px;margin-top:12px}
+.gain div{padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.gain .h{font-weight:600;border-top:0;color:var(--soft);font-size:14px}
+details{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+summary{cursor:pointer;font-weight:600;min-height:32px}
+details p,details li{font-size:14px;color:var(--soft)}
+@media(max-width:700px){.plan,.cards{grid-template-columns:minmax(0,1fr)}.card .m{font-size:30px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Which iPhone should you switch to?</h1>
+<p class="soft">Each person gets a <b>$700 phone credit</b> on T-Mobile's T-Mix Standard plan. <b>No trade-in needed</b>: keep or sell your old phone. Here's what the credit buys and how each phone compares to the one you have now.</p>
+
+<section style="margin-top:22px">
+<h2>The plan: T-Mix Standard</h2>
+<p style="margin:6px 0 4px"><span class="price">$25</span> <span class="soft">per person, per month</span></p>
+<p class="soft small">With AutoPay, plus taxes and fees.</p>
+<div class="plan">
+<div class="box"><h3>What you get</h3><ul class="k">
+<li class="yes">Unlimited talk, text and data in the US</li>
+<li class="yes">50GB of fast "premium" data a month</li>
+<li class="yes">Unlimited texting from 215+ countries</li>
+<li class="yes">Talk, text and basic data in Canada and Mexico</li>
+</ul></div>
+<div class="box"><h3>What you don't get</h3><ul class="k">
+<li class="no">Fast hotspot (it works, but only at slow 3G speed)</li>
+<li class="no">HD video (streams at 480p, standard definition)</li>
+<li class="no">Fast data abroad (Canada and Mexico data is very slow)</li>
+<li class="no">Priority after 50GB (data can slow down when the network is busy)</li>
+</ul></div>
+</div>
+</section>
+
+<section>
+<h2>Pick your current phone</h2>
+<div class="pick"><label for="cur">I have an</label><select id="cur"></select></div>
+
+<div class="legend">
+<span><i class="sw g"></i>Better than yours</span>
+<span><i class="sw y"></i>About the same</span>
+<span><i class="sw r"></i>Worse than yours</span>
+<span><i class="sw u"></i>Just different</span>
+</div>
+<div class="scroll"><table id="grid" aria-live="polite"></table></div>
+<p class="soft small" style="margin-top:8px">Battery figures are Apple's rated video playback hours when new. Your current phone's battery has likely worn down, so the real improvement is probably bigger than shown.</p>
+</section>
+
+
+<section>
+<h2>Made your choice? Text it to Matt</h2>
+<p class="soft small">Pick a phone and color, add your name, and tap the button. It opens Messages with your pick written out. Choose Matt and hit send.</p>
+<span class="lbl">Phone</span>
+<div class="pk" id="pk" role="group" aria-label="Phone"></div>
+<div id="step2" hidden>
+<span class="lbl" id="colLbl">Color</span>
+<div class="cols" id="cols" role="group" aria-label="Color"></div>
+<p style="margin:-6px 0 16px"><a class="btn s" id="photos" href="#" style="font-size:15px;min-height:44px;padding:10px 16px">See real photos of these colors on Apple.com ↗</a></p>
+</div>
+<div id="step3" hidden>
+<label class="lbl" for="who">Your name</label>
+<input type="text" id="who" autocomplete="given-name" placeholder="Mom">
+<div class="err" id="err" role="alert"></div>
+<div class="go">
+<a class="btn p" id="send" href="#">Text Matt my pick</a>
+<button type="button" class="btn s" id="copy">Copy instead</button>
+</div>
+<div class="msg" id="msg" hidden></div>
+<p class="soft small" style="margin-top:10px" id="hint">If Messages doesn't open, tap "Copy instead" and paste it into a text to Matt.</p>
+</div>
+</section>
+
+<details>
+<summary>Fine print and how the credit works</summary>
+<ul>
+<li>Phone cost is what's left after the $700 credit, spread over 36 months, added to your $25 plan. All three phones start with 256GB of storage.</li>
+<li>The credit comes as 36 monthly bill credits that pay down the phone. If you cancel early or pay the phone off, the remaining credits stop and you owe the rest.</li>
+<li>The phone credit uses that line's Picks for the 36 months, so that line won't also get a free perk like Netflix.</li>
+<li>Due at purchase: sales tax on the full phone price and a $35 device connection charge per line.</li>
+<li>Full prices (T-Mobile, 256GB): iPhone 17e $699.99, iPhone 17 $929.99, iPhone 18 Pro $1,199.99.</li>
+<li>No trade-in is required for the credit.</li>
+<li>Plan price is with AutoPay ($10/line more without), before taxes and fees. Confirm everything at the store before you sign.</li>
+</ul>
+<p><a href="https://www.t-mobile.com/cell-phone-plans">T-Mobile plans</a> · <a href="https://www.apple.com/iphone/compare/">Apple's full iPhone comparison</a></p>
+</details>
+
+</div>
+<script>
+{
+const OLD=[
+["iPhone 11","A13",1,6.1,60,12,1,17,"Lightning",0,0,194],
+["iPhone 11 Pro","A13",1,5.8,60,12,2,18,"Lightning",0,0,188],
+["iPhone 11 Pro Max","A13",1,6.5,60,12,2,20,"Lightning",0,0,226],
+["iPhone 12 mini","A14",2,5.4,60,12,1,15,"Lightning",0,0,135],
+["iPhone 12","A14",2,6.1,60,12,1,17,"Lightning",0,0,164],
+["iPhone 12 Pro","A14",2,6.1,60,12,2,17,"Lightning",0,0,189],
+["iPhone 12 Pro Max","A14",2,6.7,60,12,2.5,20,"Lightning",0,0,228],
+["iPhone 13 mini","A15",3,5.4,60,12,1,17,"Lightning",0,0,141],
+["iPhone 13","A15",3,6.1,60,12,1,19,"Lightning",0,0,174],
+["iPhone 13 Pro","A15",3,6.1,120,12,3,22,"Lightning",0,0,204],
+["iPhone 13 Pro Max","A15",3,6.7,120,12,3,28,"Lightning",0,0,240],
+["iPhone 14","A15",3,6.1,60,12,1,20,"Lightning",0,1,172],
+["iPhone 14 Plus","A15",3,6.7,60,12,1,26,"Lightning",0,1,203],
+["iPhone 14 Pro","A16",4,6.1,120,48,3,23,"Lightning",0,1,206],
+["iPhone 14 Pro Max","A16",4,6.7,120,48,3,29,"Lightning",0,1,240],
+["iPhone 15","A16",4,6.1,60,48,2,20,"USB-C",0,1,171],
+["iPhone 15 Plus","A16",4,6.7,60,48,2,26,"USB-C",0,1,201],
+["iPhone 15 Pro","A17 Pro",5,6.1,120,48,3,23,"USB-C",1,1,187],
+["iPhone 15 Pro Max","A17 Pro",5,6.7,120,48,5,29,"USB-C",1,1,221]
+].map(a=>({name:a[0],chip:a[1],rank:a[2],scr:a[3],hz:a[4],mp:a[5],uw:1,zoom:a[6],bat:a[7],port:a[8],ai:a[9],sat:a[10],wt:a[11]}));
+const NEW=[
+{cols:[["Black","#1c1c1e"],["White","#f2f2f0"],["Soft Pink","#f2d4d7"]],url:"https://www.apple.com/shop/buy-iphone/iphone-17e",name:"iPhone 17e",chip:"A19",rank:6,scr:6.1,hz:60,mp:48,uw:0,zoom:2,bat:26,port:"USB-C",ai:1,sat:1,wt:169,full:699.99,tag:"Best value"},
+{cols:[["Black","#1c1c1e"],["White","#f2f2f0"],["Mist Blue","#b9cbe0"],["Sage","#b7c4a8"],["Lavender","#cfc4e3"]],url:"https://www.apple.com/shop/buy-iphone/iphone-17",name:"iPhone 17",chip:"A19",rank:6,scr:6.3,hz:120,mp:48,uw:1,zoom:2,bat:30,port:"USB-C",ai:1,sat:1,wt:177,full:929.99,tag:"Best all-around"},
+{cols:[["Black","#1c1c1e"],["Silver","#dcdcdc"],["Glacier","#bcd6e6"],["Burgundy","#6b1f2e"]],url:"https://www.apple.com/shop/buy-iphone/iphone-18-pro",name:"iPhone 18 Pro",chip:"A20 Pro",rank:7,scr:6.3,hz:120,mp:48,uw:1,zoom:4,bat:36,port:"USB-C",ai:1,sat:1,wt:211,full:1199.99,tag:"Best camera and battery"}
+];
+const CREDIT=700,MONTHS=36;
+const money=v=>"$"+v.toFixed(2);
+const zoomTxt=z=>z===1?"None (digital only)":z+"x";
+const cmp=(n,o,tol=0)=>n-o>tol?"g":o-n>tol?"r":"y";
+const ROWS=[
+["Speed",p=>[p.chip+" chip",""],(n,o)=>({c:"g",t:n.rank-o.rank>=3?"Much faster":"Faster"})],
+["Screen smoothness",p=>[p.hz===120?"120Hz (smooth)":"60Hz",""],(n,o)=>({c:cmp(n.hz,o.hz),t:n.hz>o.hz?"Smoother":n.hz<o.hz?"Less smooth":"Same"})],
+["Main camera",p=>[p.mp+"MP",""],(n,o)=>({c:cmp(n.mp,o.mp),t:n.mp>o.mp?"Sharper photos":"Same resolution"})],
+["Ultrawide (0.5x)",p=>[p.uw?"Yes":"No",""],(n,o)=>({c:n.uw===o.uw?"y":n.uw?"g":"r",t:n.uw===o.uw?"Same":n.uw?"Gains it":"Loses it"})],
+["Zoom lens",p=>[zoomTxt(p.zoom),""],(n,o)=>({c:cmp(n.zoom,o.zoom),t:n.zoom>o.zoom?"More zoom":n.zoom<o.zoom?"Less zoom":"Same"})],
+["Battery",p=>[p.bat+" hrs video",""],(n,o)=>{const d=n.bat-o.bat;return{c:cmp(n.bat,o.bat,2),t:d>2?"+"+d+" hrs":d<-2?d+" hrs":"About the same"}}],
+["Charging port",p=>[p.port,""],(n,o)=>({c:o.port==="Lightning"?"g":"y",t:o.port==="Lightning"?"Same cable as most new devices":"Same"})],
+["Apple Intelligence",p=>[p.ai?"Yes":"No",""],(n,o)=>({c:o.ai?"y":"g",t:o.ai?"Same":"Gains it"})],
+["Satellite SOS",p=>[p.sat?"Yes":"No",""],(n,o)=>({c:o.sat?"y":"g",t:o.sat?"Same":"Gains it"})],
+["Size",p=>[p.scr+" in · "+p.wt+" g",""],(n,o)=>{const s=n.scr>o.scr?"Bigger screen":n.scr<o.scr?"Smaller screen":"Same screen size";const w=n.wt-o.wt;return{c:"u",t:s+", "+(w>0?w+" g heavier":w<0?(-w)+" g lighter":"same weight")}}]
+];
+const sel=document.getElementById("cur");
+sel.innerHTML=OLD.map((p,i)=>`<option value="${i}">${p.name}</option>`).join("");
+try{const s=localStorage.getItem("curPhone");if(s!==null&&OLD[s])sel.value=s}catch(e){}
+const cost=n=>{const left=Math.max(0,n.full-CREDIT),mo=left/MONTHS;return {mo:mo<0.5?"$0":money(mo),note:left<0.5?"Credit covers the full "+money(n.full):money(n.full)+" − $700 = "+money(left)}};
+function render(){
+const o=OLD[sel.value];
+let h=`<thead><tr><th class="row"></th><th>Your ${o.name.replace("iPhone ","")}</th>${NEW.map(n=>`<th>${n.name}<br><span class="soft small" style="font-weight:400">${n.tag}</span></th>`).join("")}</tr></thead><tbody>`;
+h+=`<tr><th class="row" scope="row">Phone cost per month</th><td class="base"><b>—</b></td>${NEW.map(n=>{const c=cost(n);return `<td class="money"><b class="mo">${c.mo}<small>/mo</small></b><i>${c.note}</i></td>`}).join("")}</tr>`;
+h+=`<tr><th class="row" scope="row">Total per month</th><td class="base"><b>—</b></td>${NEW.map(n=>{const left=Math.max(0,n.full-CREDIT)/MONTHS;return `<td class="money"><b>${left<0.5?"$25":money(25+left)}<small>/mo</small></b><i>$25 plan + phone</i></td>`}).join("")}</tr>`;
+for(const [label,val,judge] of ROWS){
+h+=`<tr><th class="row" scope="row">${label}</th><td class="base"><b>${val(o)[0]}</b></td>`;
+for(const n of NEW){const j=judge(n,o);h+=`<td class="${j.c}"><b>${val(n)[0]}</b><i>${j.t}</i></td>`}
+h+="</tr>"}
+document.getElementById("grid").innerHTML=h+"</tbody>";
+try{localStorage.setItem("curPhone",sel.value)}catch(e){}
+}
+sel.addEventListener("change",render);render();
+let P=null,C=null;
+const pk=document.getElementById("pk"),cols=document.getElementById("cols"),who=document.getElementById("who"),err=document.getElementById("err"),msgEl=document.getElementById("msg"),send=document.getElementById("send");
+pk.innerHTML=NEW.map((n,i)=>`<button type="button" class="opt" data-i="${i}" aria-pressed="false"><b>${n.name}</b><span>${cost(n).mo}/mo phone · ${n.tag}</span></button>`).join("");
+const text=()=>{const nm=who.value.trim();return nm+" picked the "+NEW[P].name+" in "+C+" (256GB)."};
+function sync(){
+for(const b of pk.children)b.setAttribute("aria-pressed",b.dataset.i==P);
+for(const b of cols.querySelectorAll("button"))b.setAttribute("aria-pressed",b.dataset.c===C);
+const ok=P!==null&&C&&who.value.trim();
+if(ok){msgEl.hidden=false;msgEl.textContent=text();send.href="sms:?&body="+encodeURIComponent(text())}else{msgEl.hidden=true;send.href="#"}
+}
+pk.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;P=+b.dataset.i;C=null;
+document.getElementById("step2").hidden=false;document.getElementById("step3").hidden=true;document.getElementById("colLbl").textContent=NEW[P].name+" colors";document.getElementById("photos").href=NEW[P].url;
+cols.innerHTML=NEW[P].cols.map(([c,h])=>`<button type="button" class="col" data-c="${c}" aria-pressed="false"><span class="dot" style="background:${h}"></span>${c}</button>`).join("");err.textContent="";sync()});
+cols.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;C=b.dataset.c;err.textContent="";document.getElementById("step3").hidden=false;sync()});
+who.addEventListener("input",()=>{err.textContent="";sync()});
+function check(){if(P===null){err.textContent="Pick a phone first.";return false}if(!C){err.textContent="Pick a color.";return false}if(!who.value.trim()){err.textContent="Add your name so Matt knows who it's from.";who.focus();return false}return true}
+send.addEventListener("click",e=>{if(!check())e.preventDefault()});
+document.getElementById("copy").addEventListener("click",async()=>{if(!check())return;try{await navigator.clipboard.writeText(text());err.textContent="";document.getElementById("copy").textContent="Copied ✓";document.getElementById("hint").textContent="Copied! Now open Messages, start a text to Matt, and paste."}catch(x){err.textContent="Couldn't copy. Press and hold the message below to copy it."}});
+
+}
+</script>
+</body>
+</html>
